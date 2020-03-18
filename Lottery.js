@@ -1,17 +1,16 @@
 "use strict";
 var Lottery = /** @class */ (function () {
     function Lottery(options) {
-        this.count = 0;
-        this.timer = 0;
-        this.started = false;
+        this.count = 0; //已转动次数
+        this.timer = 0; //定时器
+        this.started = false; //是否开始
         this.el = typeof options.el === 'string' ? document.querySelector(options.el) : options.el;
-        this.index = options.index || 0;
-        this.end = options.end || 1;
-        this.total = options.total || 4;
-        this.speed = options.speed || 100;
+        this.index = options.index || 0; //当前索引
+        this.end = options.end || 1; //结束索引
+        this.total = options.total || 4; //转动总数
+        this.speed = options.speed || 100;//转动时间
         this.nodes = this.el.querySelectorAll('.lottery-ui');
-        this.handle = options.handle || function () {};
-        this.init();
+        this.handle = options.handle || function () {};//回调函数
     }
     Lottery.prototype.init = function () {
         if (this.started)
@@ -26,11 +25,14 @@ var Lottery = /** @class */ (function () {
             node.classList.remove('active');
         });
         this.index++;
+        // 每圈转动结束后重新开始 转动次数加1
         if (this.index > this.nodes.length - 1) {
             this.count++;
             this.index = 0;
         }
+        // 给当前索引节点添加类名
         this.nodes[this.index].classList.add('active');
+        // 如果转动次数等于转动总数并且当前索引等于结束索引 停止循环执行回调
         if (this.count >= this.total && this.index === this.end) {
             setTimeout(function () {
                 _this.handle.call(_this, _this);
@@ -38,11 +40,13 @@ var Lottery = /** @class */ (function () {
             }, 500);
             clearTimeout(this.timer);
         } else {
+            // 自定义转动到某一圈的转动时间
             if (this.count >= this.total - 3) {
                 this.speed += 10;
             } else if (this.count >= this.total - 1) {
                 this.speed += 30;
             }
+            // 递归执行当前
             this.timer = setTimeout(function () {
                 _this.roll();
             }, this.speed);
