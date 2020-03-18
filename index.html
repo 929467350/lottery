@@ -1,57 +1,176 @@
-"use strict";
-var Lottery = /** @class */ (function () {
-    function Lottery(options) {
-        this.count = 0; //已转动次数
-        this.timer = 0; //定时器
-        this.started = false; //是否开始
-        this.el = typeof options.el === 'string' ? document.querySelector(options.el) : options.el;
-        this.index = options.index || 0; //当前索引
-        this.end = options.end || 1; //结束索引
-        this.total = options.total || 4; //转动总数
-        this.speed = options.speed || 100;//转动时间
-        this.nodes = this.el.querySelectorAll('.lottery-ui');
-        this.handle = options.handle || function () {};//回调函数
-    }
-    Lottery.prototype.init = function () {
-        if (this.started)
-            return;
-        this.started = true;
-        this.roll();
-        return this;
-    };
-    Lottery.prototype.roll = function () {
-        var _this = this;
-        this.nodes.forEach(function (node) {
-            node.classList.remove('active');
-        });
-        this.index++;
-        // 每圈转动结束后重新开始 转动次数加1
-        if (this.index > this.nodes.length - 1) {
-            this.count++;
-            this.index = 0;
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            text-decoration: none;
+            box-sizing: border-box;
         }
-        // 给当前索引节点添加类名
-        this.nodes[this.index].classList.add('active');
-        // 如果转动次数等于转动总数并且当前索引等于结束索引 停止循环执行回调
-        if (this.count >= this.total && this.index === this.end) {
-            setTimeout(function () {
-                _this.handle.call(_this, _this);
-                _this.started = false;
-            }, 500);
-            clearTimeout(this.timer);
-        } else {
-            // 自定义转动到某一圈的转动时间
-            if (this.count >= this.total - 3) {
-                this.speed += 10;
-            } else if (this.count >= this.total - 1) {
-                this.speed += 30;
-            }
-            // 递归执行当前
-            this.timer = setTimeout(function () {
-                _this.roll();
-            }, this.speed);
+
+        body,
+        html {
+            width: 100%;
+            height: 100%;
+            background: #eee;
+            display: -webkit-box;
+            display: flex;
+            -webkit-box-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            justify-content: center;
         }
-        return this;
-    };
-    return Lottery;
-}());
+
+        .lottery {
+            position: relative;
+        }
+
+        ul {
+            width: 240px;
+            height: 240px;
+        }
+
+        .lottery li,
+        .lottery span {
+            width: 80px;
+            height: 80px;
+            border: 1px solid #000;
+            text-align: center;
+            line-height: 80px;
+            position: absolute;
+            background: #fff;
+            font-family: "微软雅黑";
+            font-size: 1.1em;
+        }
+
+        .lottery>ul li:nth-of-type(1),
+        .lottery>ul li:nth-of-type(3),
+        .lottery>ul li:nth-of-type(4),
+        .lottery>ul li:nth-of-type(8) {
+            border-bottom: none;
+        }
+
+        .lottery>ul li:nth-of-type(2),
+        .lottery>ul li:nth-of-type(6) {
+            border-right: none;
+            border-left: none;
+        }
+
+        .lottery>ul li:nth-of-type(1) {
+            left: 0;
+            top: 0;
+        }
+
+        .lottery>ul li:nth-of-type(2) {
+            left: 80px;
+        }
+
+        .lottery>ul li:nth-of-type(3) {
+            left: 160px;
+            top: 0;
+        }
+
+        .lottery>ul li:nth-of-type(4) {
+            left: 160px;
+            top: 80px;
+        }
+
+        .lottery>ul li:nth-of-type(5) {
+            left: 160px;
+            top: 160px;
+        }
+
+        .lottery>ul li:nth-of-type(6) {
+            left: 80px;
+            top: 160px;
+        }
+
+        .lottery>ul li:nth-of-type(7) {
+            left: 0;
+            top: 160px;
+        }
+
+        .lottery>ul li:nth-of-type(8) {
+            left: 0;
+            top: 80px;
+        }
+
+        #start {
+            left: 80px;
+            top: 80px;
+            cursor: pointer;
+            background: rgba(0, 150, 136, 0.5);
+            border: none;
+        }
+
+        .active:after {
+            position: absolute;
+            top: 0;
+            left: 0;
+            content: "";
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 150, 136, 0.5)
+        }
+    </style>
+</head>
+
+<body>
+    <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        
+    <div class="lottery">
+        <ul>
+            <li class="lottery-ui">1</li>
+            <li class="lottery-ui">2</li>
+            <li class="lottery-ui">3</li>
+            <li class="lottery-ui">4</li>
+            <li class="lottery-ui">5</li>
+            <li class="lottery-ui">6</li>
+            <li class="lottery-ui">7</li>
+            <li class="lottery-ui">8</li>
+        </ul>
+        <span id="start">开始抽奖</span>
+    </div>
+    <script src="./Lottery.js"></script>
+    <script>
+        // 抽奖中不可再次点击
+        var started = false;
+
+        function random(from, to) {
+            return Math.floor(Math.random() * (to - from + 1) + from);
+        }
+        document.getElementById('start').onclick = function () {
+            if (started) return;
+            started = true;
+            new Lottery({
+                el: '.lottery',
+                index: 1, //开始位置
+                total: 5, //转动次数
+                end: random(1, 7), //结束位置 可换成请求返回的索引
+                speed: 30, //转动速度
+                handle(obj) {
+                    started = false;
+                    alert(document.querySelectorAll('.lottery-ui')[obj.end].innerHTML);
+                }
+            });
+
+        }
+    </script>
+</body>
+
+</html>
