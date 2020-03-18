@@ -11,6 +11,7 @@ var Lottery = /** @class */ (function () {
         this.speed = options.speed || 100;//转动时间
         this.nodes = this.el.querySelectorAll('.lottery-ui');
         this.handle = options.handle || function () {};//回调函数
+        this.init();
     }
     Lottery.prototype.init = function () {
         if (this.started)
